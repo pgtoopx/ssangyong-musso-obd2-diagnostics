@@ -1,0 +1,30 @@
+{
+  "session1_count": 258,
+  "session2_count": 51,
+  "freeze_frames": [
+    {
+      "id": "FF1",
+      "date": "2026-11-06 16:28",
+      "phase": "Falla 1 (Pre-limpieza mariposa)",
+      "speed_kmh": 91,
+      "rpm": 2228.5,
+      "load_pct": 63.9,
+      "map_kpa": 145,
+      "coolant_c": 83,
+      "maf_gps": 60.34,
+      "dtc": "P0102"
+    },
+    {
+      "id": "FF2",
+      "date": "2026-11-07 01:56",
+      "phase": "Falla 2 (Post-limpieza mariposa, m\u00faltiple sucio)",
+      "speed_kmh": 105,
+      "rpm": 2571.0,
+      "load_pct": 36.5,
+      "map_kpa": 122,
+      "coolant_c": 82,
+      "maf_gps": 48.25,
+      "dtc": "P0102"
+    }
+  ]
+}
