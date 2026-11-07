@@ -6,6 +6,7 @@
     <title>SsangYong Musso 2.2 — Telemetría y Diagnóstico OBD2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -26,6 +27,23 @@
     <style>
         body { background-color: #0b0f17; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
         .card { background: #131b2e; border: 1px solid #1e293b; border-radius: 0.75rem; }
+        
+        /* Markdown rendering styles */
+        .prose-dark h1 { font-size: 1.875rem; font-weight: 800; color: #ffffff; margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid #1e293b; padding-bottom: 0.5rem; }
+        .prose-dark h2 { font-size: 1.5rem; font-weight: 700; color: #60a5fa; margin-top: 1.75rem; margin-bottom: 0.75rem; border-bottom: 1px solid #1e293b; padding-bottom: 0.4rem; }
+        .prose-dark h3 { font-size: 1.25rem; font-weight: 600; color: #93c5fd; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+        .prose-dark p { margin-bottom: 1rem; line-height: 1.7; color: #cbd5e1; }
+        .prose-dark ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #cbd5e1; }
+        .prose-dark ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; color: #cbd5e1; }
+        .prose-dark li { margin-bottom: 0.35rem; }
+        .prose-dark hr { border-color: #1e293b; margin: 2rem 0; }
+        .prose-dark strong { color: #ffffff; }
+        .prose-dark table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1.5rem; font-size: 0.875rem; }
+        .prose-dark th { background-color: #0f172a; padding: 0.75rem; text-align: left; border: 1px solid #1e293b; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
+        .prose-dark td { padding: 0.75rem; border: 1px solid #1e293b; color: #e2e8f0; }
+        .prose-dark tr:hover td { background-color: rgba(30, 41, 59, 0.4); }
+        .prose-dark a { color: #38bdf8; text-decoration: underline; }
+        .prose-dark code { background: #1e293b; color: #f472b6; padding: 0.15rem 0.35rem; border-radius: 0.25rem; font-size: 0.85em; }
     </style>
 </head>
 <body class="p-4 md:p-8 max-w-7xl mx-auto">
@@ -41,138 +59,187 @@
             <h1 class="text-2xl md:text-3xl font-bold mt-2 text-white">Análisis Comparativo de Telemetría OBD2</h1>
             <p class="text-slate-400 text-sm mt-1">Comparación de flujo de aire (MAF), presión de turbo (MAP) y diagnóstico de estrangulamiento por hollín.</p>
         </div>
-        <div class="flex gap-2">
+        <div class="flex items-center gap-2">
+            <a href="https://github.com/pgtoopx/ssangyong-musso-obd2-diagnostics" target="_blank" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-medium rounded-lg border border-slate-700 transition flex items-center gap-1.5 text-white">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                Ver en GitHub
+            </a>
             <a href="data/telemetry_2026-11-06_pre_limpieza_mariposa.csv" download class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-medium rounded-lg border border-slate-700 transition">
-                📥 CSV 06-Nov (Pre)
+                📥 CSV 06-Nov
             </a>
             <a href="data/telemetry_2026-11-07_post_limpieza_mariposa.csv" download class="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-xs font-medium rounded-lg text-white transition">
-                📥 CSV 07-Nov (Post)
+                📥 CSV 07-Nov
             </a>
         </div>
     </header>
 
-    <!-- KPI Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="card p-5">
-            <div class="text-xs text-slate-400 uppercase font-semibold">Falla 1 (06-Nov Pre-Limpieza)</div>
-            <div class="text-2xl font-bold text-red-400 mt-1">91 km/h</div>
-            <div class="text-xs text-slate-400 mt-2">MAF: <span class="text-white font-medium">60.3 g/s</span> @ 2.228 RPM</div>
-            <div class="text-xs text-slate-400">Boost: <span class="text-white font-medium">145 kPa</span> (0.45 bar)</div>
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-slate-800 mb-6 gap-2">
+        <button id="tabDashboardBtn" onclick="switchTab('dashboard')" class="px-4 py-2.5 text-sm font-semibold text-blue-400 border-b-2 border-blue-500 transition flex items-center gap-2">
+            <span>📊</span> Dashboard de Telemetría
+        </button>
+        <button id="tabReadmeBtn" onclick="switchTab('readme')" class="px-4 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition flex items-center gap-2">
+            <span>📖</span> Informe Completo (README.md)
+        </button>
+    </div>
+
+    <!-- TAB 1: DASHBOARD -->
+    <div id="tabDashboard">
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="card p-5">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Falla 1 (06-Nov Pre-Limpieza)</div>
+                <div class="text-2xl font-bold text-red-400 mt-1">91 km/h</div>
+                <div class="text-xs text-slate-400 mt-2">MAF: <span class="text-white font-medium">60.3 g/s</span> @ 2.228 RPM</div>
+                <div class="text-xs text-slate-400">Boost: <span class="text-white font-medium">145 kPa</span> (0.45 bar)</div>
+            </div>
+            <div class="card p-5">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Falla 2 (07-Nov Post-Limpieza)</div>
+                <div class="text-2xl font-bold text-amber-400 mt-1">105 km/h</div>
+                <div class="text-xs text-slate-400 mt-2">MAF: <span class="text-white font-medium">48.2 g/s</span> @ 2.571 RPM</div>
+                <div class="text-xs text-slate-400">Boost: <span class="text-white font-medium">122 kPa</span> (0.22 bar)</div>
+            </div>
+            <div class="card p-5">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Déficit de Flujo en Alta</div>
+                <div class="text-2xl font-bold text-red-500 mt-1">-30%</div>
+                <div class="text-xs text-slate-400 mt-2">Teórico 2.500 RPM: <span class="text-white font-medium">~68 g/s</span></div>
+                <div class="text-xs text-slate-400">Medido real: <span class="text-red-400 font-medium">48.2 g/s</span></div>
+            </div>
+            <div class="card p-5">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Diagnóstico Causa Raíz</div>
+                <div class="text-lg font-bold text-purple-400 mt-1">Múltiple con Hollín</div>
+                <div class="text-xs text-slate-400 mt-2">Mariposa limpia ✓</div>
+                <div class="text-xs text-amber-400 font-medium">Múltiple + EGR pendientes</div>
+            </div>
         </div>
-        <div class="card p-5">
-            <div class="text-xs text-slate-400 uppercase font-semibold">Falla 2 (07-Nov Post-Limpieza)</div>
-            <div class="text-2xl font-bold text-amber-400 mt-1">105 km/h</div>
-            <div class="text-xs text-slate-400 mt-2">MAF: <span class="text-white font-medium">48.2 g/s</span> @ 2.571 RPM</div>
-            <div class="text-xs text-slate-400">Boost: <span class="text-white font-medium">122 kPa</span> (0.22 bar)</div>
+
+        <!-- Freeze Frame Comparison Table -->
+        <div class="card p-6 mb-8">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span>📸</span> Comparativa de Freeze Frames (El momento exacto del DTC P0102)
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-slate-400 uppercase bg-slate-900/60 border-b border-slate-800">
+                        <tr>
+                            <th class="px-4 py-3">Medición / Estado</th>
+                            <th class="px-4 py-3">Velocidad</th>
+                            <th class="px-4 py-3">Régimen</th>
+                            <th class="px-4 py-3">Presión MAP</th>
+                            <th class="px-4 py-3">Caudal MAF</th>
+                            <th class="px-4 py-3">Carga Motor</th>
+                            <th class="px-4 py-3">Temp. Agua</th>
+                            <th class="px-4 py-3">Código</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800 text-slate-300">
+                        <tr class="hover:bg-slate-800/40">
+                            <td class="px-4 py-3 font-semibold text-white">06-Nov (Pre-Limpieza mariposa)</td>
+                            <td class="px-4 py-3 text-red-400 font-bold">91 km/h</td>
+                            <td class="px-4 py-3">2.228 RPM</td>
+                            <td class="px-4 py-3">145 kPa (1.45 bar)</td>
+                            <td class="px-4 py-3 text-amber-400 font-bold">60.34 g/s</td>
+                            <td class="px-4 py-3">63.9 %</td>
+                            <td class="px-4 py-3">83 °C</td>
+                            <td class="px-4 py-3"><span class="px-2 py-0.5 bg-red-900/60 text-red-300 rounded text-xs">P0102</span></td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/40">
+                            <td class="px-4 py-3 font-semibold text-white">07-Nov (Post-Limpieza mariposa)</td>
+                            <td class="px-4 py-3 text-amber-400 font-bold">105 km/h</td>
+                            <td class="px-4 py-3">2.571 RPM</td>
+                            <td class="px-4 py-3">122 kPa (1.22 bar)</td>
+                            <td class="px-4 py-3 text-red-400 font-bold">48.25 g/s</td>
+                            <td class="px-4 py-3">36.5 %</td>
+                            <td class="px-4 py-3">82 °C</td>
+                            <td class="px-4 py-3"><span class="px-2 py-0.5 bg-red-900/60 text-red-300 rounded text-xs">P0102</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-xs text-slate-400 mt-3 italic">
+                * Nótese que a 105 km/h y 2.571 RPM el flujo medido fue aún MENOR (48.25 g/s) que a 91 km/h (60.34 g/s), evidenciando el estrangulamiento de los conductos del múltiple de admisión a altas velocidades de aire.
+            </p>
         </div>
-        <div class="card p-5">
-            <div class="text-xs text-slate-400 uppercase font-semibold">Déficit de Flujo en Alta</div>
-            <div class="text-2xl font-bold text-red-500 mt-1">-30%</div>
-            <div class="text-xs text-slate-400 mt-2">Teórico 2.500 RPM: <span class="text-white font-medium">~68 g/s</span></div>
-            <div class="text-xs text-slate-400">Medido real: <span class="text-red-400 font-medium">48.2 g/s</span></div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="card p-6">
+                <h3 class="text-base font-bold text-white mb-2">Flujo de Aire MAF (g/s) vs Régimen (RPM)</h3>
+                <p class="text-xs text-slate-400 mb-4">Relación de flujo durante la prueba en movimiento del 07-Nov.</p>
+                <div class="h-64">
+                    <canvas id="chartMafRpm"></canvas>
+                </div>
+            </div>
+            <div class="card p-6">
+                <h3 class="text-base font-bold text-white mb-2">Presión Turbo MAP (kPa) y Velocidad (km/h)</h3>
+                <p class="text-xs text-slate-400 mb-4">Comportamiento dinámico durante aceleración en ruta.</p>
+                <div class="h-64">
+                    <canvas id="chartMapSpeed"></canvas>
+                </div>
+            </div>
         </div>
-        <div class="card p-5">
-            <div class="text-xs text-slate-400 uppercase font-semibold">Diagnóstico Causa Raíz</div>
-            <div class="text-lg font-bold text-purple-400 mt-1">Múltiple con Hollín</div>
-            <div class="text-xs text-slate-400 mt-2">Mariposa limpia ✓</div>
-            <div class="text-xs text-amber-400 font-medium">Múltiple + EGR pendientes</div>
+
+        <!-- Technical Analysis Section -->
+        <div class="card p-6 mb-8">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span>🔬</span> Resumen de Diagnóstico Técnico
+            </h2>
+            <div class="grid md:grid-cols-3 gap-6 text-sm text-slate-300 leading-relaxed">
+                <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-800">
+                    <h4 class="font-bold text-blue-400 mb-2">1. La intervención y el cuello de botella</h4>
+                    <p>La limpieza de la mariposa despejó la entrada principal, pero el múltiple de admisión sigue colapsado por carbón y hollín. Al estar los conductos reducidos un 30-40% en diámetro, el motor se asfixia en alta demanda.</p>
+                </div>
+                <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-800">
+                    <h4 class="font-bold text-amber-400 mb-2">2. Por qué no falla en ciudad (&lt;70 km/h)</h4>
+                    <p>En ralentí (~8.5 g/s) y a velocidades moderadas (30-40 g/s), el caudal de aire cabe holgadamente. Solo al superar 90-100 km/h el aire se frena contra la carbonilla, el voltaje del MAF cae y la ECU acusa <strong>P0102</strong>.</p>
+                </div>
+                <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-800">
+                    <h4 class="font-bold text-emerald-400 mb-2">3. Pasos para la resolución final</h4>
+                    <p><strong>No cambiar el sensor MAF aún.</strong> El plan riguroso es desmontar y descarbonizar el múltiple de admisión y la válvula EGR. Luego volver a registrar en ruta a 100 km/h para verificar que alcance los 70 g/s.</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Freeze Frame Comparison Table -->
-    <div class="card p-6 mb-8">
-        <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <span>📸</span> Comparativa de Freeze Frames (El momento exacto del DTC P0102)
-        </h2>
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
-                <thead class="text-xs text-slate-400 uppercase bg-slate-900/60 border-b border-slate-800">
-                    <tr>
-                        <th class="px-4 py-3">Medición / Estado</th>
-                        <th class="px-4 py-3">Velocidad</th>
-                        <th class="px-4 py-3">Régimen</th>
-                        <th class="px-4 py-3">Presión MAP</th>
-                        <th class="px-4 py-3">Caudal MAF</th>
-                        <th class="px-4 py-3">Carga Motor</th>
-                        <th class="px-4 py-3">Temp. Agua</th>
-                        <th class="px-4 py-3">Código</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-800 text-slate-300">
-                    <tr class="hover:bg-slate-800/40">
-                        <td class="px-4 py-3 font-semibold text-white">06-Nov (Pre-Limpieza mariposa)</td>
-                        <td class="px-4 py-3 text-red-400 font-bold">91 km/h</td>
-                        <td class="px-4 py-3">2.228 RPM</td>
-                        <td class="px-4 py-3">145 kPa (1.45 bar)</td>
-                        <td class="px-4 py-3 text-amber-400 font-bold">60.34 g/s</td>
-                        <td class="px-4 py-3">63.9 %</td>
-                        <td class="px-4 py-3">83 °C</td>
-                        <td class="px-4 py-3"><span class="px-2 py-0.5 bg-red-900/60 text-red-300 rounded text-xs">P0102</span></td>
-                    </tr>
-                    <tr class="hover:bg-slate-800/40">
-                        <td class="px-4 py-3 font-semibold text-white">07-Nov (Post-Limpieza mariposa)</td>
-                        <td class="px-4 py-3 text-amber-400 font-bold">105 km/h</td>
-                        <td class="px-4 py-3">2.571 RPM</td>
-                        <td class="px-4 py-3">122 kPa (1.22 bar)</td>
-                        <td class="px-4 py-3 text-red-400 font-bold">48.25 g/s</td>
-                        <td class="px-4 py-3">36.5 %</td>
-                        <td class="px-4 py-3">82 °C</td>
-                        <td class="px-4 py-3"><span class="px-2 py-0.5 bg-red-900/60 text-red-300 rounded text-xs">P0102</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <p class="text-xs text-slate-400 mt-3 italic">
-            * Nótese que a 105 km/h y 2.571 RPM el flujo medido fue aún MENOR (48.25 g/s) que a 91 km/h (60.34 g/s), evidenciando el estrangulamiento de los conductos del múltiple de admisión a altas velocidades de aire.
-        </p>
-    </div>
-
-    <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div class="card p-6">
-            <h3 class="text-base font-bold text-white mb-2">Flujo de Aire MAF (g/s) vs Régimen (RPM)</h3>
-            <p class="text-xs text-slate-400 mb-4">Relación de flujo durante la prueba en movimiento del 07-Nov.</p>
-            <div class="h-64">
-                <canvas id="chartMafRpm"></canvas>
-            </div>
-        </div>
-        <div class="card p-6">
-            <h3 class="text-base font-bold text-white mb-2">Presión Turbo MAP (kPa) y Velocidad (km/h)</h3>
-            <p class="text-xs text-slate-400 mb-4">Comportamiento dinámico durante aceleración en ruta.</p>
-            <div class="h-64">
-                <canvas id="chartMapSpeed"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Technical Analysis Section -->
-    <div class="card p-6 mb-8">
-        <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <span>🔬</span> Análisis Técnico y Explicación Física
-        </h2>
-        <div class="grid md:grid-cols-3 gap-6 text-sm text-slate-300 leading-relaxed">
-            <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-800">
-                <h4 class="font-bold text-blue-400 mb-2">1. La intervención y el cuello de botella</h4>
-                <p>La limpieza de la mariposa de admisión despejó la entrada principal, pero el múltiple de admisión sigue colapsado por carbón y hollín. La mariposa actúa como válvula reguladora; si los conductos y lumbreras aguas abajo están reducidos un 30-40% en diámetro, el motor se asfixia en alta demanda.</p>
-            </div>
-            <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-800">
-                <h4 class="font-bold text-amber-400 mb-2">2. Por qué no falla en ciudad (&lt;70 km/h)</h4>
-                <p>En ralentí (~8.5 g/s) y a velocidades moderadas (30-40 g/s), el caudal de aire cabe holgadamente por el múltiple obstruido. Solo al superar 90-100 km/h con el motor aspirando más de 65 g/s el aire se frena contra la carbonilla, el voltaje del MAF se desploma y la ECU acusa <strong>P0102 (Circuit Low)</strong>.</p>
-            </div>
-            <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-800">
-                <h4 class="font-bold text-emerald-400 mb-2">3. Pasos para la resolución final</h4>
-                <p><strong>No cambiar el sensor MAF aún.</strong> El plan riguroso es desmontar y descarbonizar íntegramente el múltiple de admisión y la válvula EGR. Una vez que los cilindros puedan aspirar el volumen teórico, volver a registrar en ruta a 100 km/h para verificar que el MAF alcance los 70 g/s.</p>
-            </div>
+    <!-- TAB 2: README.MD VIEWER -->
+    <div id="tabReadme" class="hidden">
+        <div class="card p-6 md:p-10 mb-8">
+            <div id="readmeContent" class="prose-dark max-w-none"></div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="text-center text-xs text-slate-500 py-4 border-t border-slate-800">
-        Diagnóstico generado de forma autónoma con Antigravity &bull; Repositorio privado de telemetría OBD2 &bull; SsangYong Musso 2.2 e-XDi
+    <footer class="text-center text-xs text-slate-500 py-6 border-t border-slate-800">
+        Diagnóstico generado de forma autónoma con Antigravity &bull; Repositorio público de telemetría OBD2 &bull; SsangYong Musso 2.2 e-XDi
     </footer>
 
-    <!-- Scripts for Charts -->
+    <!-- Scripts -->
     <script>
+        // Tab switching
+        function switchTab(tab) {
+            const dashTab = document.getElementById('tabDashboard');
+            const readmeTab = document.getElementById('tabReadme');
+            const dashBtn = document.getElementById('tabDashboardBtn');
+            const readmeBtn = document.getElementById('tabReadmeBtn');
+
+            if (tab === 'dashboard') {
+                dashTab.classList.remove('hidden');
+                readmeTab.classList.add('hidden');
+                dashBtn.className = 'px-4 py-2.5 text-sm font-semibold text-blue-400 border-b-2 border-blue-500 transition flex items-center gap-2';
+                readmeBtn.className = 'px-4 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition flex items-center gap-2';
+            } else {
+                dashTab.classList.add('hidden');
+                readmeTab.classList.remove('hidden');
+                readmeBtn.className = 'px-4 py-2.5 text-sm font-semibold text-blue-400 border-b-2 border-blue-500 transition flex items-center gap-2';
+                dashBtn.className = 'px-4 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition flex items-center gap-2';
+            }
+        }
+
+        // Render embedded README Markdown
+        const rawReadme = "# SsangYong Musso 2.2 e-XDi \u2014 Diagn\u00f3stico y Telemetr\u00eda OBD2 (P0102 / P00AF)\n\nRepositorio de an\u00e1lisis forense y registro de telemetr\u00eda en tiempo real sobre veh\u00edculo **SsangYong Musso 2.2 Turbo Diesel**, enfocado en la resoluci\u00f3n de fallas de sobrealimentaci\u00f3n y restricci\u00f3n de flujo de aire (**DTC P0102 / P00AF / P0299**).\n\n---\n\n## \ud83d\udccc Contexto e Historial del Veh\u00edculo\n\n1. **Fallo Inicial (Turbo VGT Desactivado):**\n   * En pruebas previas, el actuador electr\u00f3nico de geometr\u00eda variable qued\u00f3 atascado (`P00AF(2A)` y `P0299`).\n   * La presi\u00f3n de admisi\u00f3n (MAP) no superaba los **96.0 kPa** (presi\u00f3n atmosf\u00e9rica, turbo inoperante).\n2. **Intervenci\u00f3n 1 (Limpieza de MAF):**\n   * Se desconect\u00f3 y roci\u00f3 el sensor de masa de aire (MAF) con limpiacontactos sin silicona (*Senfineco*).\n3. **Intervenci\u00f3n 2 (Limpieza de Mariposa de Admisi\u00f3n):**\n   * Se retir\u00f3 una gruesa capa de holl\u00edn y carbonilla acumulada sobre la mariposa de admisi\u00f3n / v\u00e1lvula anti-shudder.\n   * **El m\u00faltiple de admisi\u00f3n a\u00fan no ha sido desmontado ni descarbonizado.**\n\n---\n\n## \ud83d\udcca Comparativa de Mediciones (Telemetr\u00eda en Vivo)\n\nEl repositorio incluye dos capturas completas en formato CSV dentro de la carpeta [`data/`](data/):\n\n* [`telemetry_2026-11-06_pre_limpieza_mariposa.csv`](data/telemetry_2026-11-06_pre_limpieza_mariposa.csv): Captura antes de la limpieza de la mariposa.\n* [`telemetry_2026-11-07_post_limpieza_mariposa.csv`](data/telemetry_2026-11-07_post_limpieza_mariposa.csv): Captura en marcha (44 a 71 km/h) tras limpiar la mariposa.\n\n### Comparativa de \"Freeze Frames\" (El momento exacto del fallo P0102)\n\n| Par\u00e1metro | Medici\u00f3n 1 (06-Nov Pre-Limpieza) | Medici\u00f3n 2 (07-Nov Post-Limpieza) | Diferencia / Tendencia |\n| :--- | :--- | :--- | :--- |\n| **Velocidad del veh\u00edculo** | **91 km/h** | **105 km/h** | Falla exclusivamente en ruta (>90 km/h) |\n| **R\u00e9gimen del motor** | **2.228 RPM** | **2.571 RPM** | R\u00e9gimen medio-alto de crucero |\n| **Presi\u00f3n del turbo (MAP)** | **145 kPa** (1.45 bar abs) | **122 kPa** (1.22 bar abs) | El turbo est\u00e1 soplando correctamente |\n| **Carga de motor** | **63.9 %** | **36.5 %** | Carga media en autopista |\n| **Temperatura refrigerante**| **83 \u00b0C** | **82 \u00b0C** | Temperatura \u00f3ptima de trabajo |\n| **Caudal registrado (MAF)** | **60.34 g/s** | **48.25 g/s** | **-20% menor a mayor velocidad** |\n| **C\u00f3digo disparado** | **`P0102`** (*Circuit Low*) | **`P0102`** (*Circuit Low*) | Mismo DTC recurrente |\n\n---\n\n## \ud83d\udd2c Diagn\u00f3stico T\u00e9cnico de la Causa Ra\u00edz\n\n### 1. La paradoja del flujo decreciente\nA 105 km/h y 2.571 RPM, el motor aspir\u00f3 **menos aire** (48.25 g/s) que a 91 km/h y 2.228 RPM (60.34 g/s).\nPara un motor 2.2L a 2.571 RPM con 1.22 bar de presi\u00f3n absoluta, el consumo volum\u00e9trico te\u00f3rico de aire fresco es de aproximadamente **65 a 70 g/s**. El sensor registr\u00f3 un **d\u00e9ficit del 30%**.\n\n### 2. El cuello de botella (Efecto \"Arterias Tapadas\")\nLimpiar la mariposa despej\u00f3 la boca de entrada, pero al dejar el m\u00faltiple de admisi\u00f3n sin descarbonizar:\n* En ralent\u00ed (~8.5 g/s) y en ciudad (&lt;70 km/h), el aire requerido es poco y cabe holgadamente por los conductos reducidos.\n* A velocidad de autopista (>90 km/h), el motor demanda masa de aire masiva. El aire presurizado por el turbo choca contra el tap\u00f3n de carb\u00f3n en las lumbreras y corredores del m\u00faltiple. La velocidad del flujo en la admisi\u00f3n colapsa y el MAF cae por debajo de la tabla m\u00ednima permitida por la ECU, disparando **`P0102`**.\n\n### 3. Fuga en la v\u00e1lvula EGR\nCon semejante nivel de acumulaci\u00f3n de carbonilla, es probable que la v\u00e1lvula EGR no logre un sellado herm\u00e9tico al 100%, permitiendo que gases quemados ingresen a la admisi\u00f3n en r\u00e9gimen de crucero y desplacen masa de aire fresco proveniente del filtro.\n\n---\n\n## \ud83d\udee0\ufe0f Plan de Acci\u00f3n Recomendado\n\n1. **NO reemplazar el sensor MAF preventivamente:** El sensor responde de forma continua y proporcional; el problema actual es f\u00edsico/aerodin\u00e1mico por restricci\u00f3n de paso.\n2. **Desmontaje y descarbonizaci\u00f3n qu\u00edmica/mec\u00e1nica del m\u00faltiple de admisi\u00f3n.**\n3. **Limpieza e inspecci\u00f3n del sellado de la v\u00e1lvula EGR.**\n4. **Verificaci\u00f3n de prueba din\u00e1mica:** Repetir la captura en ruta a 100 km/h; con el m\u00faltiple limpio, el caudal\u00edmetro debe alcanzar 65\u201370 g/s sin encender Check Engine.\n\n---\n\n## \ud83d\udcc8 Dashboard Interactivo\n\nEl repositorio cuenta con [`index.html`](index.html), un panel interactivo desarrollado con Chart.js y Tailwind CSS para visualizar las curvas de telemetr\u00eda, comparar los puntos de fallo y descargar los datos en crudo.\n";
+        document.getElementById('readmeContent').innerHTML = marked.parse(rawReadme);
+
+        // Charts
         const s2Data = [{"ts": "01:46:59.316", "rpm": 1411.5, "spd": 45.0, "maf": 31.46, "map": 112.0, "load": 48.2, "temp": 58.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:03.464", "rpm": 1455.8, "spd": 46.0, "maf": 33.75, "map": 114.0, "load": 49.4, "temp": 58.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:04.899", "rpm": 1493.8, "spd": 48.0, "maf": 34.62, "map": 115.0, "load": 50.2, "temp": 58.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:07.713", "rpm": 1507.8, "spd": 48.0, "maf": 35.31, "map": 116.0, "load": 50.6, "temp": 58.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:09.125", "rpm": 1519.8, "spd": 48.0, "maf": 35.15, "map": 116.0, "load": 48.6, "temp": 59.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:10.539", "rpm": 1533.8, "spd": 49.0, "maf": 32.21, "map": 112.0, "load": 40.4, "temp": 59.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:11.995", "rpm": 1546.8, "spd": 49.0, "maf": 31.4, "map": 110.0, "load": 42.7, "temp": 59.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:14.539", "rpm": 1577.2, "spd": 50.0, "maf": 34.31, "map": 113.0, "load": 44.7, "temp": 59.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:16.019", "rpm": 1577.8, "spd": 50.0, "maf": 33.5, "map": 113.0, "load": 43.9, "temp": 60.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:17.487", "rpm": 1534.0, "spd": 49.0, "maf": 28.03, "map": 108.0, "load": 36.1, "temp": 60.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:21.355", "rpm": 1469.2, "spd": 47.0, "maf": 27.34, "map": 107.0, "load": 38.8, "temp": 61.0, "volt": 13.2, "dtc": "Ninguno"}, {"ts": "01:47:22.928", "rpm": 1417.0, "spd": 45.0, "maf": 23.68, "map": 105.0, "load": 32.9, "temp": 61.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:24.297", "rpm": 1392.0, "spd": 44.0, "maf": 24.9, "map": 105.0, "load": 35.3, "temp": 61.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:25.760", "rpm": 1380.0, "spd": 44.0, "maf": 29.06, "map": 108.0, "load": 41.2, "temp": 61.0, "volt": 13.2, "dtc": "Ninguno"}, {"ts": "01:47:27.256", "rpm": 1375.5, "spd": 44.0, "maf": 25.78, "map": 107.0, "load": 40.8, "temp": 61.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:28.727", "rpm": 1399.2, "spd": 44.0, "maf": 30.43, "map": 111.0, "load": 48.2, "temp": 62.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:30.074", "rpm": 1440.2, "spd": 46.0, "maf": 31.21, "map": 113.0, "load": 48.6, "temp": 62.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:31.504", "rpm": 1491.8, "spd": 48.0, "maf": 33.56, "map": 115.0, "load": 49.4, "temp": 62.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:32.974", "rpm": 1554.5, "spd": 50.0, "maf": 36.09, "map": 116.0, "load": 50.2, "temp": 62.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:34.342", "rpm": 1624.2, "spd": 52.0, "maf": 38.37, "map": 118.0, "load": 50.2, "temp": 63.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:35.780", "rpm": 1785.0, "spd": 57.0, "maf": 42.59, "map": 120.0, "load": 46.7, "temp": 63.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:38.569", "rpm": 1424.5, "spd": 58.0, "maf": 20.93, "map": 103.0, "load": 3.9, "temp": 63.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:41.358", "rpm": 1448.2, "spd": 59.0, "maf": 23.56, "map": 102.0, "load": 34.1, "temp": 64.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:42.981", "rpm": 1497.8, "spd": 61.0, "maf": 31.37, "map": 106.0, "load": 48.2, "temp": 64.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:44.341", "rpm": 1598.2, "spd": 65.0, "maf": 33.62, "map": 114.0, "load": 25.5, "temp": 64.0, "volt": 13.1, "dtc": "Ninguno"}, {"ts": "01:47:47.033", "rpm": 1633.8, "spd": 67.0, "maf": 25.03, "map": 104.0, "load": 23.1, "temp": 64.0, "volt": 13.2, "dtc": "Ninguno"}, {"ts": "01:47:49.878", "rpm": 1694.8, "spd": 69.0, "maf": 23.28, "map": 102.0, "load": 12.2, "temp": 65.0, "volt": 13.3, "dtc": "Ninguno"}, {"ts": "01:47:51.307", "rpm": 1717.8, "spd": 70.0, "maf": 21.71, "map": 101.0, "load": 20.0, "temp": 65.0, "volt": 13.2, "dtc": "Ninguno"}, {"ts": "01:47:53.929", "rpm": 1745.2, "spd": null, "maf": 23.75, "map": 101.0, "load": null, "temp": null, "volt": 13.2, "dtc": "Ninguno"}, {"ts": "01:48:10.155", "rpm": 1491.5, "spd": 70.0, "maf": 23.75, "map": 105.0, "load": 29.4, "temp": 66.0, "volt": 13.2, "dtc": "Ninguno"}, {"ts": "01:48:13.182", "rpm": 1502.8, "spd": 71.0, "maf": 31.15, "map": 112.0, "load": 31.0, "temp": 66.0, "volt": 13.2, "dtc": "Ninguno"}, {"ts": "01:48:16.833", "rpm": 1490.0, "spd": 70.0, "maf": 23.78, "map": 102.0, "load": 34.9, "temp": 67.0, "volt": 13.2, "dtc": "Ninguno"}, {"ts": "01:48:18.204", "rpm": 1495.2, "spd": 71.0, "maf": 26.87, "map": 106.0, "load": 38.4, "temp": 67.0, "volt": 13.2, "dtc": "Ninguno"}, {"ts": "01:48:19.639", "rpm": 1515.2, "spd": 71.0, "maf": 32.25, "map": 110.0, "load": 46.3, "temp": 67.0, "volt": 13.2, "dtc": "Ninguno"}];
         
         // Chart 1: MAF vs RPM
